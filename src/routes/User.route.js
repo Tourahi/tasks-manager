@@ -1,7 +1,12 @@
 const router  = require('express').Router();
 const User = require('../models/User.js');
+const auth = require('../middleware/auth.js');
 
-router.post('/users' , async  (req , res) => {
+router.get('/users/me' , auth , async (req , res) => {
+  res.status(200).send(req.user);
+});
+
+router.post('/users'  , async  (req , res) => {
   const user = new User(req.body);
   try {
     await user.save();
@@ -32,14 +37,6 @@ router.get('/users/:id', async (req , res) => {
   }
 });
 
-router.get('/users' , async (req , res) => {
-  try {
-      let users = await User.find({});
-      res.status(200).send(users);
-  } catch (e) {
-      res.status(400).send('There is no users yet in our database.');
-  }
-});
 
 router.patch('/users/:id', async (req , res) => {
   //THis should be a middleware
