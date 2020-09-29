@@ -1,9 +1,13 @@
 const router  = require('express').Router();
 const Task = require('../models/Task.js');
+const auth = require('../middleware/auth.js');
 
 //Tasks
-router.post('/tasks' ,async (req , res) => {
-  const task = new Task(req.body);
+router.post('/tasks' ,auth ,async (req , res) => {
+  const task = new Task({
+    ...req.body,
+    owner : req.user._id
+  });
   try {
     await task.save();
     res.status(201).send(task);
@@ -12,26 +16,26 @@ router.post('/tasks' ,async (req , res) => {
   }
 });
 
-router.get('/tasks/:id', async (req , res) => {
+router.get('/tasks/:id',auth, async (req , res) => {
   let _id = req.params.id;
   try {
-    let task = await Task.findById(_id);
+    const task = await Task.findOne({_id , owner : req.user._id});
     res.status(200).send(task);
   } catch (err) {
     res.status(404).send(' Task does not exist.');
   }
 });
 
-router.get('/tasks' , async (req , res) => {
+router.get('/tasks' ,auth , async (req , res) => {
   try {
-    let tasks = await Task.find({});
+    const tasks = await Task.find({owner : req.user._id});
     res.status(200).send(tasks);
   } catch (e) {
     res.status(400).send('There is no Tasks yet in our database.');
   }
 });
 
-router.patch('/tasks/:id', async (req , res) => {
+router.patch('/tasks/:id', auth , async (req , res) => {
   //THis should be a middleware
   const updates = Object.keys(req.body);
   const allowedUpdates = ['status' , 'description'];
@@ -41,9 +45,10 @@ router.patch('/tasks/:id', async (req , res) => {
     res.status(400).send("One of the updates is not allowed.");
   }
   try {
-    const task = await Task.findById(
-      req.params.id
-    );
+    let task = await Task.findOne({
+        _id : req.params.id,
+        owner : req.user._id
+    });
 
     updates.forEach((update) => task[update] = req.body[update]);
     await task.save();
@@ -57,9 +62,14 @@ router.patch('/tasks/:id', async (req , res) => {
   }
 });
 
-router.delete('/tasks/:id' , async (req,res) => {
+router.delete('/tasks/:id' ,auth, async (req,res) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id);
+
+    const task = await Task.deleteOne({
+      _id : req.params.id,
+      owner : req.user._id
+    });
+
     if(!task) {
       return res.status(404).send('Task Not found');
     }

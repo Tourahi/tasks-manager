@@ -2,6 +2,7 @@ const mongoose  = require('mongoose');
 const validator = require('validator');
 const bcrypt    = require('bcryptjs');
 const jwt       = require('jsonwebtoken');
+const Task      = require('./Task');
 
 const userSchema = new mongoose.Schema({
   username : {
@@ -47,6 +48,12 @@ userSchema.pre('save' ,async function (next) {
   next();
 });
 
+// Delete all task of a user if he removes his account
+userSchema.pre('remove' , async function(next) {
+  await Task.deleteMany({owner : this._id});
+  next();
+});
+
 
 userSchema.statics.findByCredentials = async function (email , password){
   const user = await this.findOne({ email });
@@ -68,6 +75,12 @@ userSchema.methods.genereteAuthToken = async function() {
   await this.save();
   return token;
 }
+
+userSchema.virtual('tasks' , {
+	ref : 'Task',
+	localField : '_id',
+	foreignField : 'owner'
+});
 
 userSchema.methods.toJSON = function() {
   const userObj = this.toObject();
