@@ -27,9 +27,27 @@ router.get('/tasks/:id',auth, async (req , res) => {
 });
 
 router.get('/tasks' ,auth , async (req , res) => {
+  const match = {};
+  if(req.query.status) {
+    match.status = req.query.status === 'true'
+  }
+  //Sorting
+  const sort = {};
+  if(req.query.sortBy) {
+    const splited = req.query.sortBy.split(':');
+    sort[splited[0]] = splited[1] === 'desc' ? -1 : 1;
+  }
   try {
-    const tasks = await Task.find({owner : req.user._id});
-    res.status(200).send(tasks);
+    await req.user.populate({
+      path : 'tasks',
+      match,
+      options : {
+        limit : parseInt(req.query.limit),
+        skip  : parseInt(req.query.skip),
+        sort
+      }
+    }).execPopulate()
+    res.send(req.user.tasks)
   } catch (e) {
     res.status(400).send('There is no Tasks yet in our database.');
   }

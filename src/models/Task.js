@@ -12,19 +12,13 @@ const taskSchema = new mongoose.Schema({
     type : Boolean,
     default : false,
   },
-  // lastUpdate : { //Date of completion
-  //   type : Date,
-  //   required : false,
-  // },
   owner : {
     type : mongoose.Schema.Types.ObjectId,
     required : true,
     ref : 'User'
-  },
-  createdAt : {
-    type : Date,
-    default : Date.now
   }
+} , {
+  timestamps : true,
 });
 
 module.exports = mongoose.model('Task' , taskSchema);
