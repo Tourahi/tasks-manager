@@ -1,10 +1,8 @@
 const mongoose = require('mongoose');
-const MONGO_URI = 'mongodb://127.0.0.1:27017';
-const DBNAME    = 'task-manager-api';
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect( MONGO_URI+`/${DBNAME}`, {
+    const conn = await mongoose.connect( process.env.MONGO_URI+`/${process.env.DBNAME}`, {
       useNewUrlParser : true ,
       useUnifiedTopology: true,
       useFindAndModify : false,

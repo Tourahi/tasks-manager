@@ -2,6 +2,7 @@ const express = require('express');
 const connectDB = require('./db/mongoose.js');
 const Task = require('./models/Task.js');
 const app = express();
+require('dotenv').config();
 const PORT = process.env.PORT || 8080;
 
 //Database setUp
