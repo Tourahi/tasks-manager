@@ -27,7 +27,8 @@ test('Should signUp a new user', async () => {
     username : "maromaro",
     email    : "maromaro@maromaro.com",
     password : "maromaro"
-  }).expect(201)
+  })
+  .expect(201)
 });
 
 
@@ -36,7 +37,8 @@ test('Should successfully ;) fail to login.',async () => {
   await request(app).post('/users/login').send({
     email    : "userOne.email",
     password : "userOne.password"
-  }).expect(400)
+  })
+  .expect(400)
 });
 
 // Login
@@ -44,7 +46,8 @@ test('Should successfully LogIn a user', async () => {
   await request(app).post('/users/login').send({
     email    : userOne.email,
     password : userOne.password
-  }).expect(200)
+  })
+  .expect(200)
 });
 
 // get Profile testing
@@ -53,4 +56,12 @@ test('Should get profile for user', async () => {
                     .set('Authorization',`Bearer ${userOne.tokens[0].token}`)
                     .send()
                     .expect(200)
-})
+});
+
+// Testing the deleting routes
+test('Should delete a user.' , async () => {
+  await request(app).delete('/users/me')
+                    .set('Authorization',`Bearer ${userOne.tokens[0].token}`)
+                    .send()
+                    .expect(200);
+});
