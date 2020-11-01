@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "env-cmd -f ./config/.test.env jest --watch",
+    "test": "env-cmd -f ./config/.test.env jest --watch --runInBand",
     "dev": "env-cmd -f ./config/.env nodemon src/main.js"
   },
   "jest": {
